@@ -11,8 +11,10 @@ set(CMAKE_CXX_STANDARD 11)
 # Set the project name based on the name given on the gradle.properties
 project("${APP_LIB_NAME}")
 
+set(RAYLIB_DIR "${CMAKE_SOURCE_DIR}/../../../../raylib")
+
 # Include raylib and raymob as a subdirectories
-add_subdirectory(${CMAKE_SOURCE_DIR}/deps/raylib)
+add_subdirectory(${RAYLIB_DIR} ${CMAKE_BINARY_DIR}/raylib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/deps/raymob)
 
 # Fetch all source files for your project (recursively), excluding 'deps' source files
@@ -37,7 +39,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 endif()
 
 # Include raylib and raymob header files
-target_include_directories(${APP_LIB_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/deps/raylib")
+target_include_directories(${APP_LIB_NAME} PRIVATE "${RAYLIB_DIR}")
 target_include_directories(${APP_LIB_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/deps/raymob")
 
 # Link required libraries to the native application

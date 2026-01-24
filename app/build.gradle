@@ -36,7 +36,7 @@ static def getGLVersionCode(String version) {
 
 android {
     namespace project.properties['app.application_id']
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         minSdk 24
@@ -78,15 +78,17 @@ android {
                           "-DGL_VERSION=$glVersion"
             }
         }
+    }
 
-        applicationVariants.all { variant ->
-            // Change output names to the correct ones
-            variant.outputs.all {
-                outputFileName = outputFileName.replace("com.raylib.raymob", project.properties['app.application_id'])
-                outputFileName = outputFileName.replace("raymob", project.properties['app.native_library_name'])
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            for (output in variant.outputs) {
+                def appId = project.properties['app.application_id'] as String
+                def libName = project.properties['app.native_library_name'] as String
+                def currentName = output.outputFileName.get()
+                output.outputFileName.set(currentName.replace("com.raylib.raymob", appId).replace("raymob", libName))
             }
         }
-
     }
 
     // Execute the preBuild task before the compilation
@@ -145,17 +147,21 @@ android {
             zipAlignEnabled true
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.30.3'
+            version '3.30.5'
         }
     }
+
     buildFeatures {
+        resValues true
         buildConfig true
         viewBinding true
     }
