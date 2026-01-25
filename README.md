@@ -1,3 +1,35 @@
+# raymob fork for a multiplatform project based on raylib-iOS
+
+⚠️ This is an unofficial fork of [raymob](https://github.com/Bigfoot71/raymob) providing multiplatform (Android / iOS / Windows / macOS / Linux) support.
+
+This fork is **not affiliated with the official raymob project**.
+
+## What is different from upstream
+
+- Switched the dependency from [raylib](https://github.com/raysan5/raylib) to [raylib-iOS](https://github.com/raysan5/raylib);
+
+- Moved raylib submodule path to share it across across IDEs; 
+  
+- Minor tooling updates.
+
+## Recommended project structure
+
+```
+MyProject
+├── desktop (VSCode project for Windows / macOS / Linux)
+├── ios (Xcode project - see example in raylib-iOS)
+├── android (Android Studio project - this repository)
+├── core (common code shared across all platforms)
+└── raylib (raylib-iOS submodule)
+```
+
+## Status
+
+This fork is intended for experimental and personal use.
+It is **not production-ready**.
+
+---
+
 <img src="app/src/main/ic_launcher-playstore.png" alt="raymob icon" width="256" height="256">
 
 # raymob [![Targeting raylib 5.5+](https://img.shields.io/badge/raylib-5.5+-3DDC84)](https://raylib.com) [![Supported Platforms](https://img.shields.io/badge/Platform-Android-3DDC84)](https://developer.android.com/) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![License](https://img.shields.io/badge/license-zlib%2Flibpng-blue.svg)](LICENSE)
