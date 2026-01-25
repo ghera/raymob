@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD 11)
 # Set the project name based on the name given on the gradle.properties
 project("${APP_LIB_NAME}")
 
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384")
+
 set(RAYLIB_DIR "${CMAKE_SOURCE_DIR}/../../../../raylib")
 
 # Include raylib and raymob as a subdirectories
