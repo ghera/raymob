@@ -15,6 +15,14 @@ This fork is **not affiliated with the official raymob project**.
   C. A game receives the callbacks only if it calls `InitCallBacks()` once after
   `InitWindow`; until then BACK sends the app to the background;
 
+- Android: the app focus edge belongs to the engine, not to the bridge. `rcore_android.c`
+  grants one frame after `APP_CMD_LOST_FOCUS` with `FLAG_WINDOW_UNFOCUSED` still set and
+  returns from the event pump, so the game pauses by reading `IsWindowFocused()` and the
+  frame it pauses in is the one the system snapshots -- nothing to install, and nothing
+  written from the Java thread. `SetOnPauseCallBack()` / `SetOnResumeCallBack()` still
+  fire but are deprecated for that job: they are the same edge, delivered from the wrong
+  thread;
+
 - Android: display cutout insets (`GetSafeAreaInsets()`), in-app review
   (`RequestInAppReview()`), device language (`GetPreferredLanguage()`) and the AdMob
   bridge (banner/interstitial + UMP consent form, `InitAds()` / `SetAdsBannerVisible()` /

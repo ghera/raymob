@@ -342,12 +342,21 @@ void SetOnStartCallBack(Callback callback);
 /**
  * @brief Sets the callback function to be called when the application resumes.
  *
+ * @deprecated Not the way to pause: the engine reports the focus edge itself. It grants
+ *             one frame after the app resigns active with `IsWindowFocused()` already
+ *             false, and the flag comes back on its own, so a game reads the state
+ *             instead of waiting for this. The callback still fires, but it arrives on
+ *             the Java thread -- which is the thread the edge must not come from.
+ *
  * @param callback The callback function to be executed on resume.
  */
 void SetOnResumeCallBack(Callback callback);
 
 /**
  * @brief Sets the callback function to be called when the application pauses.
+ *
+ * @deprecated See `SetOnResumeCallBack()`: prefer `IsWindowFocused()`, and paint the
+ *             pause in the frame the engine grants.
  *
  * @param callback The callback function to be executed on pause.
  */

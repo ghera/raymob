@@ -40,7 +40,7 @@ custom_onAppStop(JNIEnv *env, jobject obj) {
 }
 JNIEXPORT void JNICALL
 custom_onAppBack(JNIEnv *env, jobject obj) {
-    if(onBack) onBack();   /* the game answers through OGT_UI_ACT_QUIT */
+    if(onBack) onBack();   /* the game decides: a step back, or the task to the background */
 }
 
 void MoveTaskToBackground(void) {
