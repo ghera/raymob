@@ -12,8 +12,10 @@ This fork is **not affiliated with the official raymob project**.
 
 - Android: the back gesture is routed through `OnBackInvokedCallback` (API 33+, the only
   path from API 36) instead of `KEYCODE_BACK`, with `MoveTaskToBackground()` available from
-  C. A game receives the callbacks only if it calls `InitCallBacks()` once after
-  `InitWindow`; until then BACK sends the app to the background;
+  C. A game receives the BACK callback only if it calls `InitCallBacks()` once after
+  `InitWindow`; until then BACK sends the app to the background. Below API 33 there is no
+  dispatcher: the key still arrives, but raylib *eats* it after queueing it, so a game that
+  wants BACK on those versions has to read `KEY_BACK` from `GetKeyPressed()`;
 
 - Android: the app focus edge belongs to the engine, not to the bridge. `rcore_android.c`
   grants one frame after `APP_CMD_LOST_FOCUS` with `FLAG_WINDOW_UNFOCUSED` still set and
