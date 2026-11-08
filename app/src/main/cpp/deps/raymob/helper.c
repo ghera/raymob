@@ -258,6 +258,93 @@ char* GetL10NString(const char* value)
     return NULL;
 }
 
+void RequestInAppReview(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "REVIEW: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID requestReviewMethod = (*env)->GetMethodID(env, nativeLoaderClass, "requestInAppReview", "()V");
+    if (requestReviewMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "REVIEW: Android requestInAppReview method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return;
+    }
+
+    (*env)->CallVoidMethod(env, nativeLoaderInstance, requestReviewMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "REVIEW: Android requestInAppReview raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+}
+
+const char* GetPreferredLanguage(void)
+{
+    static char preferredLanguage[32] = { 0 };
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        DetachCurrentThread();
+        return NULL;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID getPreferredLanguageMethod = (*env)->GetMethodID(env, nativeLoaderClass, "getPreferredLanguage", "()Ljava/lang/String;");
+    if (getPreferredLanguageMethod == NULL)
+    {
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return NULL;
+    }
+
+    jstring languageString = (jstring)(*env)->CallObjectMethod(env, nativeLoaderInstance, getPreferredLanguageMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return NULL;
+    }
+
+    if (languageString == NULL)
+    {
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return NULL;
+    }
+
+    const char* languageChars = (*env)->GetStringUTFChars(env, languageString, NULL);
+    if (languageChars != NULL)
+    {
+        strncpy(preferredLanguage, languageChars, sizeof(preferredLanguage) - 1);
+        preferredLanguage[sizeof(preferredLanguage) - 1] = '\0';
+        (*env)->ReleaseStringUTFChars(env, languageString, languageChars);
+    }
+
+    (*env)->DeleteLocalRef(env, languageString);
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+
+    return preferredLanguage[0] != '\0' ? preferredLanguage : NULL;
+}
+
 char* GetAppStoragePath(){
 
     jobject nativeInstance = GetNativeLoaderInstance();

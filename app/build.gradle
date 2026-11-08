@@ -98,6 +98,10 @@ android {
         // Modify the package name and library name in NativeLoader.java
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "package com.raylib.raymob;", "package " + project.properties['app.application_id'] + ";")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "System.loadLibrary\\(\"raymob\"\\);", "System.loadLibrary\\(\"" + project.properties['app.native_library_name'] + "\"\\);")
+        updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "import com.raylib.raymob.bridge.ReviewHelper;", "import " + project.properties['app.application_id'] + ".bridge.ReviewHelper;")
+
+        // The bridge classes live in their own subpackage
+        updateFile("src/main/java/com/raylib/raymob/bridge/ReviewHelper.java", "package com.raylib.raymob.bridge;", "package " + project.properties['app.application_id'] + ".bridge;")
 
         // Modify the package name and library name in other java classes
         updateFile("src/main/java/com/raylib/raymob/DisplayManager.java", "package com.raylib.raymob;", "package " + project.properties['app.application_id'] + ";")
@@ -118,7 +122,10 @@ android {
         // Restore the package name and library name in NativeLoader.java
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "System.loadLibrary\\(\"" + project.properties['app.native_library_name'] + "\"\\);", "System.loadLibrary\\(\"raymob\"\\);")
+        updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "import " + project.properties['app.application_id'] + ".bridge.ReviewHelper;", "import com.raylib.raymob.bridge.ReviewHelper;")
 
+        // The bridge classes live in their own subpackage
+        updateFile("src/main/java/com/raylib/raymob/bridge/ReviewHelper.java", "package " + project.properties['app.application_id'] + ".bridge;", "package com.raylib.raymob.bridge;")
         // Restore the package name and library name in other java classes
         updateFile("src/main/java/com/raylib/raymob/DisplayManager.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
         updateFile("src/main/java/com/raylib/raymob/SoftKeyboard.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
@@ -170,4 +177,5 @@ android {
 
 dependencies {
     implementation "androidx.core:core:1.17.0"
+    implementation "com.google.android.play:review:2.0.2"
 }

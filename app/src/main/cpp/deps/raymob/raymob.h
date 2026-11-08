@@ -118,6 +118,16 @@ char* LoadCacheFile(const char* fileName);
  */
 char* GetL10NString(const char* value);
 
+/**
+ * @brief Requests the Android in-app review flow through the NativeLoader Java layer.
+ */
+void RequestInAppReview(void);
+
+/**
+ * @brief Returns the device preferred language through the NativeLoader Java layer.
+ */
+const char* GetPreferredLanguage(void);
+
 
 /* Vibrator functions */
 

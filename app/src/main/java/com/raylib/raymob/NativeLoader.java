@@ -25,15 +25,19 @@
 package com.raylib.raymob;  // Don't change the package name (see gradle.properties)
 
 import android.app.NativeActivity;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.os.Bundle;
 import android.window.OnBackInvokedDispatcher;
 
+import com.raylib.raymob.bridge.ReviewHelper;
+
 public class NativeLoader extends NativeActivity {
 
     public DisplayManager displayManager;
     public SoftKeyboard softKeyboard;
+    public ReviewHelper reviewHelper;
     public boolean initCallback = false;
 
     // Loading method of your native application
@@ -42,6 +46,7 @@ public class NativeLoader extends NativeActivity {
         super.onCreate(savedInstanceState);
         displayManager = new DisplayManager(this);
         softKeyboard = new SoftKeyboard(this);
+        reviewHelper = new ReviewHelper(this);
         System.loadLibrary("raymob");   // Load your game library (don't change raymob, see gradle.properties)
 
         /* BACK, the supported way: from API 33 the system delivers the gesture here
@@ -116,5 +121,22 @@ public class NativeLoader extends NativeActivity {
     private native void onAppPause();
     private native void onAppStop();
     private native void onAppBack();
+
+    public void requestInAppReview() {
+        reviewHelper.requestInAppReview();
+    }
+
+    public String getPreferredLanguage() {
+        Configuration configuration = getResources().getConfiguration();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            if (!configuration.getLocales().isEmpty()) {
+                return configuration.getLocales().get(0).toLanguageTag();
+            }
+        } else if (configuration.locale != null) {
+            return configuration.locale.toLanguageTag();
+        }
+
+        return java.util.Locale.getDefault().toLanguageTag();
+    }
 
 }
