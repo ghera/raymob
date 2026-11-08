@@ -345,6 +345,110 @@ const char* GetPreferredLanguage(void)
     return preferredLanguage[0] != '\0' ? preferredLanguage : NULL;
 }
 
+void InitAds(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID initAdsMethod = (*env)->GetMethodID(env, nativeLoaderClass, "initAds", "()V");
+    if (initAdsMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android initAds method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return;
+    }
+
+    (*env)->CallVoidMethod(env, nativeLoaderInstance, initAdsMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ADS: Android initAds raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+}
+
+void SetAdsBannerVisible(bool visible)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID setBannerVisibleMethod = (*env)->GetMethodID(env, nativeLoaderClass, "setAdsBannerVisible", "(Z)V");
+    if (setBannerVisibleMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android setAdsBannerVisible method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return;
+    }
+
+    (*env)->CallVoidMethod(env, nativeLoaderInstance, setBannerVisibleMethod, visible ? JNI_TRUE : JNI_FALSE);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ADS: Android setAdsBannerVisible raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+}
+
+float GetAdsReservedBottomInset(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return 0.0f;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID getReservedInsetMethod = (*env)->GetMethodID(env, nativeLoaderClass, "getAdsReservedBottomInset", "()F");
+    if (getReservedInsetMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android getAdsReservedBottomInset method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return 0.0f;
+    }
+
+    jfloat inset = (*env)->CallFloatMethod(env, nativeLoaderInstance, getReservedInsetMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ADS: Android getAdsReservedBottomInset raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        inset = 0.0f;
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+    return inset;
+}
+
 char* GetAppStoragePath(){
 
     jobject nativeInstance = GetNativeLoaderInstance();
@@ -515,4 +619,221 @@ void RemoveFileInAppStorage(const char *filepath){
 
     RL_FREE(appStoragePath);
     RL_FREE(path);
+}
+
+// -----------------------------------------------------------------------------
+// Interstitial Ads
+// -----------------------------------------------------------------------------
+
+void ShowInterstitialAd(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID showInterstitialMethod = (*env)->GetMethodID(env, nativeLoaderClass, "showInterstitialAd", "()V");
+    if (showInterstitialMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android showInterstitialAd method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return;
+    }
+
+    (*env)->CallVoidMethod(env, nativeLoaderInstance, showInterstitialMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ADS: Android showInterstitialAd raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+}
+
+bool IsInterstitialAdReady(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return false;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID isReadyMethod = (*env)->GetMethodID(env, nativeLoaderClass, "isInterstitialReady", "()Z");
+    if (isReadyMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android isInterstitialReady method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return false;
+    }
+
+    jboolean ready = (*env)->CallBooleanMethod(env, nativeLoaderInstance, isReadyMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ADS: Android isInterstitialReady raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        ready = JNI_FALSE;
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+    return (bool)ready;
+}
+
+bool WasInterstitialAdDismissed(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return false;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID wasDismissedMethod = (*env)->GetMethodID(env, nativeLoaderClass, "wasInterstitialDismissed", "()Z");
+    if (wasDismissedMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ADS: Android wasInterstitialDismissed method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return false;
+    }
+
+    jboolean dismissed = (*env)->CallBooleanMethod(env, nativeLoaderInstance, wasDismissedMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ADS: Android wasInterstitialDismissed raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        dismissed = JNI_FALSE;
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+    return (bool)dismissed;
+}
+
+void LogAnalyticsEvent(const char* eventName,
+                       const char* stringParamName,
+                       const char* stringParamValue,
+                       const char* intParam1Name,
+                       int intParam1Value,
+                       const char* intParam2Name,
+                       int intParam2Value,
+                       const char* intParam3Name,
+                       int intParam3Value)
+{
+    if (eventName == NULL || eventName[0] == '\0')
+    {
+        return;
+    }
+
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "ANALYTICS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID logEventMethod = (*env)->GetMethodID(
+        env,
+        nativeLoaderClass,
+        "logAnalyticsEvent",
+        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ILjava/lang/String;I)V");
+    if (logEventMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "ANALYTICS: Android logAnalyticsEvent method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return;
+    }
+
+    jstring jEventName = (*env)->NewStringUTF(env, eventName);
+    jstring jStringParamName = (*env)->NewStringUTF(env, stringParamName != NULL ? stringParamName : "");
+    jstring jStringParamValue = (*env)->NewStringUTF(env, stringParamValue != NULL ? stringParamValue : "");
+    jstring jIntParam1Name = (*env)->NewStringUTF(env, intParam1Name != NULL ? intParam1Name : "");
+    jstring jIntParam2Name = (*env)->NewStringUTF(env, intParam2Name != NULL ? intParam2Name : "");
+    jstring jIntParam3Name = (*env)->NewStringUTF(env, intParam3Name != NULL ? intParam3Name : "");
+
+    (*env)->CallVoidMethod(env,
+                           nativeLoaderInstance,
+                           logEventMethod,
+                           jEventName,
+                           jStringParamName,
+                           jStringParamValue,
+                           jIntParam1Name,
+                           (jint)intParam1Value,
+                           jIntParam2Name,
+                           (jint)intParam2Value,
+                           jIntParam3Name,
+                           (jint)intParam3Value);
+    if ((*env)->ExceptionCheck(env))
+    {
+        TraceLog(LOG_WARNING, "ANALYTICS: Android logAnalyticsEvent raised an exception");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+    }
+
+    (*env)->DeleteLocalRef(env, jEventName);
+    (*env)->DeleteLocalRef(env, jStringParamName);
+    (*env)->DeleteLocalRef(env, jStringParamValue);
+    (*env)->DeleteLocalRef(env, jIntParam1Name);
+    (*env)->DeleteLocalRef(env, jIntParam2Name);
+    (*env)->DeleteLocalRef(env, jIntParam3Name);
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
+}
+
+void CrashForCrashlyticsTest(void)
+{
+    JNIEnv* env = AttachCurrentThread();
+    jobject nativeLoaderInstance = GetNativeLoaderInstance();
+
+    if (nativeLoaderInstance == NULL)
+    {
+        TraceLog(LOG_WARNING, "CRASHLYTICS: Android NativeLoader instance unavailable");
+        DetachCurrentThread();
+        return;
+    }
+
+    jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInstance);
+    jmethodID crashMethod = (*env)->GetMethodID(env, nativeLoaderClass, "crashForCrashlyticsTest", "()V");
+    if (crashMethod == NULL)
+    {
+        TraceLog(LOG_WARNING, "CRASHLYTICS: Android crashForCrashlyticsTest method unavailable");
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+        return;
+    }
+
+    (*env)->CallVoidMethod(env, nativeLoaderInstance, crashMethod);
+    if ((*env)->ExceptionCheck(env))
+    {
+        return;
+    }
+
+    (*env)->DeleteLocalRef(env, nativeLoaderClass);
+    DetachCurrentThread();
 }

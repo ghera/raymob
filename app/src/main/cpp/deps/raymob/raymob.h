@@ -128,6 +128,61 @@ void RequestInAppReview(void);
  */
 const char* GetPreferredLanguage(void);
 
+/**
+ * @brief Initializes Android ads and consent through the NativeLoader Java layer.
+ */
+void InitAds(void);
+
+/**
+ * @brief Sets Android banner visibility through the NativeLoader Java layer.
+ *
+ * @param visible Whether the banner should be visible.
+ */
+void SetAdsBannerVisible(bool visible);
+
+/**
+ * @brief Returns the bottom inset reserved for Android banner ads in screen pixels.
+ */
+float GetAdsReservedBottomInset(void);
+
+/**
+ * @brief Shows a pre-loaded interstitial ad.
+ */
+void ShowInterstitialAd(void);
+
+/**
+ * @brief Checks if an interstitial ad is loaded and ready to show.
+ *
+ * @return true if an interstitial ad is available.
+ */
+bool IsInterstitialAdReady(void);
+
+/**
+ * @brief Checks if the interstitial ad has been dismissed since the last call.
+ *        Consumes the flag (returns true only once per dismissal).
+ *
+ * @return true if the interstitial was dismissed.
+ */
+bool WasInterstitialAdDismissed(void);
+
+/**
+ * @brief Logs a Firebase Analytics event through the Android Java layer.
+ */
+void LogAnalyticsEvent(const char* eventName,
+                       const char* stringParamName,
+                       const char* stringParamValue,
+                       const char* intParam1Name,
+                       int intParam1Value,
+                       const char* intParam2Name,
+                       int intParam2Value,
+                       const char* intParam3Name,
+                       int intParam3Value);
+
+/**
+ * @brief Forces an Android crash to test Firebase Crashlytics.
+ */
+void CrashForCrashlyticsTest(void);
+
 
 /* Vibrator functions */
 

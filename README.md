@@ -9,11 +9,20 @@ This fork is **not affiliated with the official raymob project**.
 - Switched the dependency from [raylib](https://github.com/raysan5/raylib) to [raylib-iOS](https://github.com/raysan5/raylib);
 
 - Moved raylib submodule path to share it across across IDEs; 
-- 
+
 - Android: the back gesture is routed through `OnBackInvokedCallback` (API 33+, the only
   path from API 36) instead of `KEYCODE_BACK`, with `MoveTaskToBackground()` available from
   C. A game receives the callbacks only if it calls `InitCallBacks()` once after
   `InitWindow`; until then BACK sends the app to the background;
+
+- Android: display cutout insets (`GetSafeAreaInsets()`), in-app review
+  (`RequestInAppReview()`), device language (`GetPreferredLanguage()`) and the AdMob
+  bridge (banner/interstitial + UMP consent form, `InitAds()` / `SetAdsBannerVisible()` /
+  `ShowInterstitialAd()`), which also propagates the consent decision to Firebase Consent
+  Mode v2. The ads stack is off as long as `admob.app_id` in `gradle.properties` is empty;
+  to turn it on, fill the three `admob.*` properties, declare
+  `com.google.android.gms.permission.AD_ID` in the manifest, and add `google-services.json`
+  plus the `google-services` plugin only if analytics is wanted too;
   
 - Minor tooling updates.
 

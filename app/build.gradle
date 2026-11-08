@@ -55,6 +55,17 @@ android {
         buildConfigField("boolean", "FEATURE_DISPLAY_IMMERSIVE", project.properties['display.immersive'] ?: "false")
         buildConfigField("boolean", "FEATURE_DISPLAY_INTO_CUTOUT", project.properties['display.into_cutout'] ?: "false")
 
+        // AdMob ids; an empty app id keeps the whole ads stack off (see AdsHelper.init).
+        // A project that wants ads fills these in gradle.properties with its own ids,
+        // or with Google's public test ids (ca-app-pub-3940256099942544~3347511713,
+        // .../9214589741 banner, .../1033173712 interstitial).
+        def admobAppId = project.properties['admob.app_id'] ?: ""
+        def admobBannerAdUnitId = project.properties['admob.banner_unit_id'] ?: ""
+        def admobInterstitialAdUnitId = project.properties['admob.interstitial_unit_id'] ?: ""
+        buildConfigField("String", "ADMOB_APP_ID", "\"${admobAppId}\"")
+        buildConfigField("String", "ADMOB_BANNER_AD_UNIT_ID", "\"${admobBannerAdUnitId}\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_AD_UNIT_ID", "\"${admobInterstitialAdUnitId}\"")
+
         // Substitution variables for the manifest
         manifestPlaceholders = [
             'GL_VERSION_CODE': getGLVersionCode(project.properties['gl.version']) ?: "0x00020000",
@@ -123,9 +134,12 @@ android {
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "System.loadLibrary\\(\"" + project.properties['app.native_library_name'] + "\"\\);", "System.loadLibrary\\(\"raymob\"\\);")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "import " + project.properties['app.application_id'] + ".bridge.ReviewHelper;", "import com.raylib.raymob.bridge.ReviewHelper;")
+        updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "import com.raylib.raymob.bridge.AdsHelper;", "import " + project.properties['app.application_id'] + ".bridge.AdsHelper;")
 
         // The bridge classes live in their own subpackage
         updateFile("src/main/java/com/raylib/raymob/bridge/ReviewHelper.java", "package " + project.properties['app.application_id'] + ".bridge;", "package com.raylib.raymob.bridge;")
+        updateFile("src/main/java/com/raylib/raymob/bridge/AdsHelper.java", "package " + project.properties['app.application_id'] + ".bridge;", "package com.raylib.raymob.bridge;")
+        updateFile("src/main/java/com/raylib/raymob/bridge/AdsHelper.java", "import " + project.properties['app.application_id'] + ".BuildConfig;", "import com.raylib.raymob.BuildConfig;")
         // Restore the package name and library name in other java classes
         updateFile("src/main/java/com/raylib/raymob/DisplayManager.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
         updateFile("src/main/java/com/raylib/raymob/SoftKeyboard.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
@@ -178,4 +192,8 @@ android {
 dependencies {
     implementation "androidx.core:core:1.17.0"
     implementation "com.google.android.play:review:2.0.2"
+    implementation platform("com.google.firebase:firebase-bom:35.1.0")
+    implementation "com.google.firebase:firebase-analytics"
+    implementation "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.6.0"
+    implementation "com.google.android.ump:user-messaging-platform:4.0.0"
 }
