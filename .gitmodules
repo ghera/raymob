@@ -1,4 +1,4 @@
 [submodule "raylib"]
 	path = raylib
 	url = https://github.com/ghera/raylib-iOS 
-	branch = release/5.5
+	branch = release/6.2
