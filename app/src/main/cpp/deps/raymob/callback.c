@@ -4,6 +4,7 @@ static Callback onStart = NULL;
 static Callback onPause = NULL;
 static Callback onResume = NULL;
 static Callback onStop = NULL;
+static Callback onBack = NULL;
 
 void SetOnStartCallBack(Callback callback){
     onStart = callback;
@@ -16,6 +17,9 @@ void SetOnPauseCallBack(Callback callback){
 }
 void SetOnStopCallBack(Callback callback){
     onStop = callback;
+}
+void SetOnBackCallBack(Callback callback){
+    onBack = callback;
 }
 
 JNIEXPORT void JNICALL
@@ -34,12 +38,30 @@ JNIEXPORT void JNICALL
 custom_onAppStop(JNIEnv *env, jobject obj) {
     if(onStop) onStop();
 }
+JNIEXPORT void JNICALL
+custom_onAppBack(JNIEnv *env, jobject obj) {
+    if(onBack) onBack();   /* the game answers through OGT_UI_ACT_QUIT */
+}
+
+void MoveTaskToBackground(void) {
+    jobject instance = GetNativeLoaderInstance();
+    if (instance == NULL) return;
+
+    JNIEnv* env = AttachCurrentThread();
+    jclass cls = (*env)->GetObjectClass(env, instance);
+    jmethodID method = (*env)->GetMethodID(env, cls, "moveTaskToBackground", "()V");
+
+    if (method != NULL) (*env)->CallVoidMethod(env, instance, method);
+
+    DetachCurrentThread();
+}
 
 static JNINativeMethod methods[] = {
         {"onAppStart", "()V", (void *)custom_onAppStart},
         {"onAppResume", "()V", (void *)custom_onAppResume},
         {"onAppPause", "()V", (void *)custom_onAppPause},
         {"onAppStop", "()V", (void *)custom_onAppStop},
+        {"onAppBack", "()V", (void *)custom_onAppBack},
 };
 
 void InitCallBacks(){

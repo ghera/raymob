@@ -289,6 +289,18 @@ void SetOnPauseCallBack(Callback callback);
 void SetOnStopCallBack(Callback callback);
 
 /**
+ * @brief Sets the callback function to be called when the user goes BACK.
+ *
+ * @param callback The callback function to be executed on the back gesture.
+ */
+void SetOnBackCallBack(Callback callback);
+
+/**
+ * @brief Moves the task to the background (the game's "quit" from BACK).
+ */
+void MoveTaskToBackground(void);
+
+/**
  * @brief Get the app specific storage root path.
  *
  * @warning This function returns a string allocated on the heap.

@@ -9,6 +9,11 @@ This fork is **not affiliated with the official raymob project**.
 - Switched the dependency from [raylib](https://github.com/raysan5/raylib) to [raylib-iOS](https://github.com/raysan5/raylib);
 
 - Moved raylib submodule path to share it across across IDEs; 
+- 
+- Android: the back gesture is routed through `OnBackInvokedCallback` (API 33+, the only
+  path from API 36) instead of `KEYCODE_BACK`, with `MoveTaskToBackground()` available from
+  C. A game receives the callbacks only if it calls `InitCallBacks()` once after
+  `InitWindow`; until then BACK sends the app to the background;
   
 - Minor tooling updates.
 

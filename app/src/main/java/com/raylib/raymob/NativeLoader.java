@@ -25,8 +25,10 @@
 package com.raylib.raymob;  // Don't change the package name (see gradle.properties)
 
 import android.app.NativeActivity;
+import android.os.Build;
 import android.view.KeyEvent;
 import android.os.Bundle;
+import android.window.OnBackInvokedDispatcher;
 
 public class NativeLoader extends NativeActivity {
 
@@ -41,6 +43,18 @@ public class NativeLoader extends NativeActivity {
         displayManager = new DisplayManager(this);
         softKeyboard = new SoftKeyboard(this);
         System.loadLibrary("raymob");   // Load your game library (don't change raymob, see gradle.properties)
+
+        /* BACK, the supported way: from API 33 the system delivers the gesture here
+           instead of the KEYCODE_BACK key, and from API 36 (this app's target) it
+           does not dispatch the key at all, finishing the activity instead. The
+           native side registers its handlers, and flags itself ready, from
+           InitCallBacks() at boot; until a game calls it, BACK backgrounds the app
+           rather than going dead. */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> { if (initCallback) onAppBack(); else moveTaskToBackground(); });
+        }
     }
 
     // Handling loss and regain of application focus
@@ -91,9 +105,16 @@ public class NativeLoader extends NativeActivity {
         }
     }
 
+    /** Called from the native side when BACK has nothing left to close: the game
+     *  goes to the background rather than being destroyed. */
+    public void moveTaskToBackground() {
+        runOnUiThread(() -> moveTaskToBack(true));
+    }
+
     private native void onAppStart();
     private native void onAppResume();
     private native void onAppPause();
     private native void onAppStop();
+    private native void onAppBack();
 
 }
