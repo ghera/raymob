@@ -24,3 +24,11 @@
 -keep class com.raylib.raymob.NativeLoader {
     public <methods>;
 }
+
+# The native side resolves members by name (GetFieldID / GetMethodID / RegisterNatives),
+# so R8 must not rename these: "public <methods>" alone leaves the private native methods,
+# the fields and the DisplayManager/SoftKeyboard methods renamed, and every JNI call then
+# fails silently (or throws) in a release build.
+-keep class com.raylib.raymob.NativeLoader { *; }
+-keep class com.raylib.raymob.DisplayManager { *; }
+-keep class com.raylib.raymob.SoftKeyboard { *; }
