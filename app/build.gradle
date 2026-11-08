@@ -106,7 +106,8 @@ android {
     // Execute the preBuild task before the compilation
     preBuild.doLast {
 
-        // Modify the package name and library name in NativeLoader.java
+        // Modify the package name and library name in LaunchActivity.java and NativeLoader.java
+        updateFile("src/main/java/com/raylib/raymob/LaunchActivity.java", "package com.raylib.raymob;", "package " + project.properties['app.application_id'] + ";")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "package com.raylib.raymob;", "package " + project.properties['app.application_id'] + ";")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "System.loadLibrary\\(\"raymob\"\\);", "System.loadLibrary\\(\"" + project.properties['app.native_library_name'] + "\"\\);")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "import com.raylib.raymob.bridge.ReviewHelper;", "import " + project.properties['app.application_id'] + ".bridge.ReviewHelper;")
@@ -130,7 +131,8 @@ android {
     // Execute the postBuild task after the compilation
     gradle.buildFinished {
 
-        // Restore the package name and library name in NativeLoader.java
+        // Restore the package name and library name in LaunchActivity.java and NativeLoader.java
+        updateFile("src/main/java/com/raylib/raymob/LaunchActivity.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "package " + project.properties['app.application_id'] + ";", "package com.raylib.raymob;")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "System.loadLibrary\\(\"" + project.properties['app.native_library_name'] + "\"\\);", "System.loadLibrary\\(\"raymob\"\\);")
         updateFile("src/main/java/com/raylib/raymob/NativeLoader.java", "import " + project.properties['app.application_id'] + ".bridge.ReviewHelper;", "import com.raylib.raymob.bridge.ReviewHelper;")
@@ -191,6 +193,7 @@ android {
 
 dependencies {
     implementation "androidx.core:core:1.17.0"
+    implementation "androidx.core:core-splashscreen:1.2.0"
     implementation "com.google.android.play:review:2.0.2"
     implementation platform("com.google.firebase:firebase-bom:35.1.0")
     implementation "com.google.firebase:firebase-analytics"

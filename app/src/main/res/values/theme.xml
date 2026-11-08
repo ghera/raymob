@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <!-- On some Samsung devices the system still shows a centered icon if this item is omitted. -->
+        <item name="windowSplashScreenAnimatedIcon">@color/splash_background</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.Game</item>
+    </style>
+
+    <style name="AppTheme.Game" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
+</resources>

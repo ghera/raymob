@@ -29,17 +29,27 @@
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
         <activity
-            android:name=".NativeLoader"
+            android:name=".LaunchActivity"
+            android:theme="@style/AppTheme"
             android:configChanges="keyboardHidden"
-            android:screenOrientation="${APP_ORIENTATION}"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="CustomSplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.${APP_CATEGORY}" />
             </intent-filter>
+        </activity>
 
+        <activity
+            android:name=".NativeLoader"
+            android:theme="@style/AppTheme.Game"
+            android:configChanges="keyboardHidden|screenSize"
+            android:screenOrientation="${APP_ORIENTATION}"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="${APP_LIB_NAME}" />
