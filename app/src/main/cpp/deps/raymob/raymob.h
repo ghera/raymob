@@ -179,6 +179,13 @@ void DisableSensor(Sensor sensor);
 Orientation GetScreenOrientation();
 
 /**
+ * @brief Retrieves display cutout safe area insets in screen pixels.
+ *
+ * @return A Vector4 containing left, top, right, bottom insets.
+ */
+Vector4 GetSafeAreaInsets(void);
+
+/**
  * @brief Retrieves the current accelerometer axis values.
  *
  * @return A Vector3 representing the accelerometer axis (x, y, z).

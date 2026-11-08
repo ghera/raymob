@@ -72,3 +72,57 @@ Orientation GetScreenOrientation()
 
     return result;
 }
+
+Vector4 GetSafeAreaInsets(void)
+{
+    Vector4 result = {0};
+    jobject nativeLoaderInst = GetNativeLoaderInstance();
+
+    if (nativeLoaderInst != NULL) {
+        JNIEnv* env = AttachCurrentThread();
+
+        jclass nativeLoaderClass = (*env)->GetObjectClass(env, nativeLoaderInst);
+        jfieldID displayManagerField = (*env)->GetFieldID(env, nativeLoaderClass, "displayManager", "Lcom/raylib/raymob/DisplayManager;");
+        if (displayManagerField == NULL) {
+            DetachCurrentThread();
+            return result;
+        }
+
+        jobject displayManager = (*env)->GetObjectField(env, nativeLoaderInst, displayManagerField);
+
+        if (displayManager != NULL) {
+            jclass displayManagerClass = (*env)->GetObjectClass(env, displayManager);
+            jmethodID safeAreaMethod = (*env)->GetMethodID(env, displayManagerClass, "getSafeAreaInsets", "()[I");
+
+            if (safeAreaMethod != NULL) {
+                jintArray safeArea = (jintArray)(*env)->CallObjectMethod(env, displayManager, safeAreaMethod);
+                if ((*env)->ExceptionCheck(env)) {
+                    (*env)->ExceptionDescribe(env);
+                    (*env)->ExceptionClear(env);
+                    safeArea = NULL;
+                }
+
+                if (safeArea != NULL && (*env)->GetArrayLength(env, safeArea) >= 4) {
+                    jint values[4] = {0};
+                    (*env)->GetIntArrayRegion(env, safeArea, 0, 4, values);
+                    result.x = (float)values[0];
+                    result.y = (float)values[1];
+                    result.z = (float)values[2];
+                    result.w = (float)values[3];
+                }
+
+                if (safeArea != NULL) {
+                    (*env)->DeleteLocalRef(env, safeArea);
+                }
+            }
+
+            (*env)->DeleteLocalRef(env, displayManagerClass);
+            (*env)->DeleteLocalRef(env, displayManager);
+        }
+
+        (*env)->DeleteLocalRef(env, nativeLoaderClass);
+        DetachCurrentThread();
+    }
+
+    return result;
+}

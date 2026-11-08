@@ -1,9 +1,11 @@
 package com.raylib.raymob;
 
 import android.os.Build;
+import android.view.DisplayCutout;
 import android.view.Display;
 import android.app.NativeActivity;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager.LayoutParams;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -34,8 +36,9 @@ public class DisplayManager {
     }
 
     public void enableEdgeToEdge() {
-        Window window = activity.getWindow();
-        WindowCompat.enableEdgeToEdge(window);
+        // Use manual edge-to-edge setup instead of the convenience helper because
+        // Play Console flags the helper's internal deprecated bar color calls on Android 15.
+        WindowCompat.setDecorFitsSystemWindows(activity.getWindow(), false);
     }
 
     public void keepScreenOn(boolean keepOn) {
@@ -59,6 +62,32 @@ public class DisplayManager {
     public int getOrientation()
     {
         return display != null ? display.getRotation() : -1;
+    }
+
+    public int[] getSafeAreaInsets()
+    {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return new int[] {0, 0, 0, 0};
+        }
+
+        WindowInsets insets;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            insets = activity.getWindowManager().getCurrentWindowMetrics().getWindowInsets();
+        } else {
+            insets = activity.getWindow().getDecorView().getRootWindowInsets();
+        }
+
+        if (insets == null || insets.getDisplayCutout() == null) {
+            return new int[] {0, 0, 0, 0};
+        }
+
+        DisplayCutout cutout = insets.getDisplayCutout();
+        return new int[] {
+            cutout.getSafeInsetLeft(),
+            cutout.getSafeInsetTop(),
+            cutout.getSafeInsetRight(),
+            cutout.getSafeInsetBottom()
+        };
     }
 
     public void renderIntoCutoutArea() {
